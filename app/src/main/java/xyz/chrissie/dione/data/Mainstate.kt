@@ -6,6 +6,7 @@ import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.PersistState
 import com.airbnb.mvrx.Uninitialized
 
+/* This is a data class of states/ data i need to persist in the app. Makes use of mavericks*/
 data class MainState(
     val title: String = "Hello World",
     @PersistState val count: Int = 0,
