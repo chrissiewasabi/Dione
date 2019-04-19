@@ -12,6 +12,8 @@ import com.airbnb.mvrx.withState
 import com.bumptech.glide.Glide
 import com.esafirm.imagepicker.features.ImagePicker
 import com.esafirm.imagepicker.model.Image
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.content_main.*
 import rx.functions.Action1
 import xyz.chrissie.dione.viewmodels.MainViewModel
@@ -24,6 +26,7 @@ class MainFragment : BaseMvRxFragment() {
 
     private val viewModel: MainViewModel by fragmentViewModel()
     private var images = ArrayList<Image>()
+    private lateinit var selectedImage: File
 
     companion object {
         private const val TAG = "Main Fragment"
@@ -40,14 +43,38 @@ class MainFragment : BaseMvRxFragment() {
 
         fbImageChooser.setOnClickListener {
             viewModel.captureImage(this).forEach(action)
+        }
+        btnScatter.setOnClickListener {
+            btnScatter.isClickable = false
+            btnScatter.isEnabled = false
+            progressBar.visibility = View.VISIBLE
+            //perform scattering and return results
+            viewModel.getScatteredImage(selectedImage)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe { result ->
+                    progressBar.visibility = View.GONE
+                    btnScatter.isEnabled = true
+                    img_pixelated.visibility = View.VISIBLE
+                    tvStatus.visibility = View.VISIBLE
+
+
+                }
+
 
         }
+
+
     }
 
     override fun invalidate(): Unit = withState(viewModel) { state ->
         val file = File(state.image)
+        selectedImage = file
         val imageUri = Uri.fromFile(file)
         Glide.with(this).load(imageUri).into(img_original)
+        btnScatter.visibility = state.showButton
+
+
     }
 
 
@@ -73,6 +100,7 @@ class MainFragment : BaseMvRxFragment() {
             i++
         }
         viewModel.setImage(stringBuffer.toString())
+        viewModel.showButtonStatus(View.VISIBLE)
 
 
     }
