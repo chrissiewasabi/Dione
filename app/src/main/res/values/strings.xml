@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">ICTLife</string>
     <string name="action_settings">Settings</string>
+    <string name="scatter_image">Scatter Image</string>
+    <string name="action_complete">Image Encryption Complete</string>
 </resources>
